@@ -3,10 +3,10 @@ export interface User {
   googleId?: string;
   email: string;
   name: string;
+  phone?: string;
   avatar?: string;
   role?: 'user' | 'admin';
   isActive?: boolean;
-  isEmailVerified?: boolean;
   lastLogin?: string;
   createdAt?: string;
   updatedAt?: string;

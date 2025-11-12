@@ -4,7 +4,7 @@ import LoginPage from './page/Login';
 import RegisterPage from './page/Register';
 import HomePage from './page/HomePage';
 import ForgotPassword from './page/ForgotPassword';
-
+import Profile from './page/Profile'
 function App() {
   return (
     <BrowserRouter>
@@ -14,6 +14,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

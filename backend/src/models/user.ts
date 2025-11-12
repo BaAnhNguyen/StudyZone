@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { required } from 'joi';
 
 export interface IUser extends Document {
   _id: ObjectId;
@@ -7,6 +8,7 @@ export interface IUser extends Document {
   password?: string; // Optional vì có thể đăng nhập bằng Google
   email: string;
   name: string;
+  phone:string;
   avatar?: string;
   role?: 'user' | 'admin';
   isActive?: boolean;
@@ -26,6 +28,10 @@ const UserSchema: Schema = new Schema(
     password: {
       type: String,
       select: false // Không trả về password khi query
+    },
+    phone : {
+      type: String,
+      required: false
     },
     email: {
       type: String,

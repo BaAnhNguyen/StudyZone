@@ -41,7 +41,10 @@ const HomePage : React.FC = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-full">
+              <Link 
+                to="/profile"
+                className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+              >
                 <img 
                   src={user.avatar} 
                   alt={user.name} 
@@ -51,7 +54,7 @@ const HomePage : React.FC = () => {
                   <p className="text-sm font-semibold text-gray-800">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
-              </div>
+              </Link>
               <button
                 onClick={handleLogoutClick}
                 className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition-colors font-medium"
