@@ -10,7 +10,6 @@ export interface IUser extends Document {
   avatar?: string;
   role?: 'user' | 'admin';
   isActive?: boolean;
-  isEmailVerified?: boolean; // Xác thực email
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -53,10 +52,6 @@ const UserSchema: Schema = new Schema(
       type: Boolean,
       default: true
     },
-    isEmailVerified: {
-      type: Boolean,
-      default: false
-    },
     lastLogin: {
       type: Date,
       default: Date.now
@@ -73,7 +68,7 @@ UserSchema.pre('save', async function(next) {
   
   if (this.password) {
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password as string, salt);
   }
   next();
 });
@@ -81,7 +76,7 @@ UserSchema.pre('save', async function(next) {
 // Method so sánh password
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
   if (!this.password) return false;
-  return bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password as string);
 };
 
-export default mongoose.model<IUser>('User', UserSchema);
+export default mongoose.model<IUser>('User', UserSchema, 'User');
