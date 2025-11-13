@@ -1,89 +1,87 @@
-import jwt from 'jsonwebtoken';
-
-export interface JWTPayload {
-    userId: string;
-    role_code: string;
-}
-
-export class JWTUtils {
-    private static readonly JWT_SECRET = process.env.JWT_SECRET ?? 'my-secret-key-change-in-production';
-    private static readonly JWT_EXPIRES_IN = '7d'; // 7 ngày
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JWTUtils = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+class JWTUtils {
     /**
      * Tạo access token
      */
-    public static generateAccessToken(payload: JWTPayload): string {
-        return jwt.sign(payload, this.JWT_SECRET, {
+    static generateAccessToken(payload) {
+        return jsonwebtoken_1.default.sign(payload, this.JWT_SECRET, {
             expiresIn: this.JWT_EXPIRES_IN,
             algorithm: 'HS256'
         });
     }
-
     /**
      * Verify và decode token
      */
-    public static verifyToken(token: string): JWTPayload | null {
+    static verifyToken(token) {
         try {
-            const decoded = jwt.verify(token, this.JWT_SECRET) as JWTPayload;
-            return decoded;          
-        } catch (error) {
+            const decoded = jsonwebtoken_1.default.verify(token, this.JWT_SECRET);
+            return decoded;
+        }
+        catch (error) {
             console.error('JWT verification error:', error);
             return null;
         }
     }
-
     /**
      * Decode token không verify (để lấy thông tin khi token expired)
      */
-    public static decodeToken(token: string): JWTPayload | null {
+    static decodeToken(token) {
         try {
-            const decoded = jwt.decode(token) as JWTPayload;
+            const decoded = jsonwebtoken_1.default.decode(token);
             return decoded;
-        } catch (error) {
+        }
+        catch (error) {
             console.error('JWT decode error:', error);
             return null;
         }
     }
-
-    public static generateVerificationToken(payload: any): string {
+    static generateVerificationToken(payload) {
         const secret = process.env.JWT_VERIFICATION_SECRET || process.env.JWT_SECRET || 'verification_secret_key';
-        return jwt.sign(payload, secret, {
+        return jsonwebtoken_1.default.sign(payload, secret, {
             expiresIn: '24h',
             algorithm: 'HS256'
         });
     }
-
     /**
      * Verify verification token
      */
-    public static verifyVerificationToken(token: string): any {
+    static verifyVerificationToken(token) {
         try {
             const secret = process.env.JWT_VERIFICATION_SECRET || process.env.JWT_SECRET || 'verification_secret_key';
-            return jwt.verify(token, secret);
-        } catch (error) {
+            return jsonwebtoken_1.default.verify(token, secret);
+        }
+        catch (error) {
             console.error('Verification token error:', error);
             return null;
         }
     }
-    
-    public static generateResetPasswordToken(payload: { email: string; userId: string }): string {
+    static generateResetPasswordToken(payload) {
         const secret = process.env.JWT_RESET_PASSWORD_SECRET || process.env.JWT_SECRET || 'reset_password_secret';
-        return jwt.sign(payload, secret, {
+        return jsonwebtoken_1.default.sign(payload, secret, {
             expiresIn: '1h',
             algorithm: 'HS256'
         });
     }
-
     /**
      * Verify reset password token
      */
-    public static verifyResetPasswordToken(token: string): { email: string; userId: string } | null {
+    static verifyResetPasswordToken(token) {
         try {
             const secret = process.env.JWT_RESET_PASSWORD_SECRET || process.env.JWT_SECRET || 'reset_password_secret';
-            return jwt.verify(token, secret) as { email: string; userId: string };
-        } catch (error) {
+            return jsonwebtoken_1.default.verify(token, secret);
+        }
+        catch (error) {
             console.error('Reset password token error:', error);
             return null;
         }
     }
-} 
+}
+exports.JWTUtils = JWTUtils;
+JWTUtils.JWT_SECRET = process.env.JWT_SECRET ?? 'my-secret-key-change-in-production';
+JWTUtils.JWT_EXPIRES_IN = '7d'; // 7 ngày

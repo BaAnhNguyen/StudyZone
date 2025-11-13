@@ -7,7 +7,8 @@ const router = Router();
 router.get(
   '/google',
   passport.authenticate('google', {
-    scope: ['profile', 'email']
+    scope: ['profile', 'email'],
+    prompt: 'select_account' 
   })
 );
 
@@ -18,8 +19,9 @@ router.get(
     failureRedirect: '/login-failed'
   }),
   (req, res) => {
-    // Redirect về frontend Vite
-    res.redirect(process.env.CLIENT_URL || 'http://localhost:5173');
+    // Redirect về frontend với query param để trigger checkAuth
+    const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}?auth=success`);
   }
 );
 
@@ -47,11 +49,23 @@ router.post('/logout', (req, res) => {
         message: 'Logout failed'
       });
     }
-    res.json({
-      success: true,
-      message: 'Logged out successfully'
+
+    // Xóa session
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to destroy session'
+        });
+      }
+      res.clearCookie('connect.sid'); // xóa cookie session
+      res.json({
+        success: true,
+        message: 'Logged out successfully (Google/Session)'
+      });
     });
   });
 });
+
 
 export default router;

@@ -127,7 +127,6 @@ router.post('/login', async (req: Request, res: Response) => {
       name: user.name,
       avatar: user.avatar,
       role: user.role,
-      isEmailVerified: user.isEmailVerified
     };
 
     res.json({
@@ -179,7 +178,6 @@ router.get('/me', authenticateToken, async (req: Request, res: Response) => {
         name: user.name,
         avatar: user.avatar,
         role: user.role,
-        isEmailVerified: user.isEmailVerified,
         lastLogin: user.lastLogin
       }
     });
@@ -225,14 +223,7 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       });
     }
 
-    if (user.isEmailVerified) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email đã được xác thực trước đó'
-      });
-    }
 
-    user.isEmailVerified = true;
     await user.save();
 
     res.json({
@@ -404,6 +395,89 @@ router.post('/change-password', authenticateToken, async (req: Request, res: Res
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi đổi mật khẩu'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/reset-password-by-email
+ * Đặt lại mật khẩu bằng email (không cần token)
+ */
+router.post('/reset-password-by-email', async (req: Request, res: Response) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email và mật khẩu mới là bắt buộc'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 6 ký tự'
+      });
+    }
+
+    // Tìm user theo email
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Email không tồn tại trong hệ thống'
+      });
+    }
+
+    // Đặt lại mật khẩu mới
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Đặt lại mật khẩu thành công'
+    });
+  } catch (error) {
+    console.error('Reset password by email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi đặt lại mật khẩu'
+    });
+  }
+});
+/**
+ * POST /api/auth/logout
+ * Đăng xuất JWT (client sẽ xóa token)
+ */
+router.post('/logout', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = req.jwtUser?.userId;
+
+    if (userId) {
+      // Có thể log việc logout hoặc invalidate token ở đây
+      console.log(`User ${userId} logged out at ${new Date().toISOString()}`);
+      
+      // Nếu có session (trường hợp mixed auth), xóa session
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error('Session destroy error:', err);
+          }
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully (JWT)'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi đăng xuất'
     });
   }
 });

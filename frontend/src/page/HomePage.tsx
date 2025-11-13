@@ -1,14 +1,22 @@
 import { Link } from 'react-router-dom';
-import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import ConfirmModal from '../components/ConfirmModal';
 
 const HomePage : React.FC = () => {
   const { user, logout } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
-    if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
-      await logout();
-    }
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    setIsLoggingOut(false);
+    setShowLogoutModal(false);
   };
 
   return (
@@ -33,7 +41,10 @@ const HomePage : React.FC = () => {
 
           {user ? (
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-full">
+              <Link 
+                to="/profile"
+                className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+              >
                 <img 
                   src={user.avatar} 
                   alt={user.name} 
@@ -43,9 +54,9 @@ const HomePage : React.FC = () => {
                   <p className="text-sm font-semibold text-gray-800">{user.name}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
-              </div>
+              </Link>
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition-colors font-medium"
               >
                 Đăng xuất
@@ -61,20 +72,6 @@ const HomePage : React.FC = () => {
           )}
         </nav>
       </header>
-
-      {/* Welcome Banner - Hiển thị khi đã đăng nhập */}
-      {user && (
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-2xl font-bold">
-              🎉 Chào mừng trở lại, {user.name}! 🎉
-            </h2>
-            <p className="mt-2 text-blue-100">
-              Sẵn sàng tiếp tục hành trình học tập của bạn!
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* ...existing code... */}
       {/* Hero Section */}
@@ -248,6 +245,18 @@ const HomePage : React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        title="Xác nhận đăng xuất"
+        message="Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?"
+        confirmText="Đăng xuất"
+        cancelText="Hủy"
+        isLoading={isLoggingOut}
+      />
     </div>
   );
 };
