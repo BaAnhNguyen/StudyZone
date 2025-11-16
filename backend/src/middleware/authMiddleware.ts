@@ -24,7 +24,7 @@ export const isAuthenticated = (
  * Sử dụng cho routes cần hỗ trợ cả 2 loại authentication (view/update profile)
  */
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  // 1. Kiểm tra Session-based auth (Google OAuth) trước
+  // 1. Kiểm tra Sessio-based auth (Google OAuth) trước
   if (req.isAuthenticated && req.isAuthenticated() && req.user) {
     return next();
   }
@@ -46,11 +46,13 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     
     // Gán user vào request để sử dụng ở các middleware/controller tiếp theo
     req.user = decoded;
+    (req as any).jwtUser = decoded; // Cũng set jwtUser cho compatibility
     next();
   } catch (error) {
     return res.status(403).json({
       success: false,
-      message: 'Token không hợp lệ hoặc đã hết hạn'
+      message: 'Token không hợp lệ hoặc đã hết hạn',
+      error: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 };

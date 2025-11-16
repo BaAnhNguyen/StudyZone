@@ -4,14 +4,14 @@ import mongoose, { Schema, Document, ObjectId } from "mongoose";
 export interface IFlashcard extends Document {
   _id: ObjectId
   userId: mongoose.Types.ObjectId;
-  word: string;
+  words: string;
   means: string;
   createdAt: Date;
 }
 
 const FlashCardSchema = new Schema<IFlashcard>({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  word: { type: String, required: true },
+  words: { type: String, required: true },
   means: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 },

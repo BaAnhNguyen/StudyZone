@@ -11,6 +11,7 @@ export interface IUser extends Document {
   phone:string;
   avatar?: string;
   role?: 'user' | 'admin';
+  total_card?: Number,
   isActive?: boolean;
   lastLogin?: Date;
   createdAt: Date;
@@ -48,6 +49,10 @@ const UserSchema: Schema = new Schema(
     avatar: {
       type: String,
       default: null
+    },
+    total_card: {
+      type: Number,
+      required: false
     },
     role: {
       type: String,

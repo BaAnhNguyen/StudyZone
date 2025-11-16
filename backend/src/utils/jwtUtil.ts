@@ -6,14 +6,18 @@ export interface JWTPayload {
 }
 
 export class JWTUtils {
-    private static readonly JWT_SECRET = process.env.JWT_SECRET ?? 'my-secret-key-change-in-production';
     private static readonly JWT_EXPIRES_IN = '7d'; // 7 ngày
+
+    // Hàm helper để lấy JWT_SECRET mỗi lần gọi
+    private static getSecret(): string {
+        return process.env.JWT_SECRET || 'my-secret-key-change-in-production';
+    }
 
     /**
      * Tạo access token
      */
     public static generateAccessToken(payload: JWTPayload): string {
-        return jwt.sign(payload, this.JWT_SECRET, {
+        return jwt.sign(payload, this.getSecret(), {
             expiresIn: this.JWT_EXPIRES_IN,
             algorithm: 'HS256'
         });
@@ -24,7 +28,7 @@ export class JWTUtils {
      */
     public static verifyToken(token: string): JWTPayload | null {
         try {
-            const decoded = jwt.verify(token, this.JWT_SECRET) as JWTPayload;
+            const decoded = jwt.verify(token, this.getSecret()) as JWTPayload;
             return decoded;          
         } catch (error) {
             console.error('JWT verification error:', error);

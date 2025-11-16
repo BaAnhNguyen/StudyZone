@@ -4,6 +4,7 @@ import session from 'express-session';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import userController from './controller/userController'
+import flashCardController from './controller/flashCardController'
 
 // Import routes
 import authController from '../src/controller/authController'; // Google OAuth routes
@@ -41,6 +42,7 @@ app.use(passport.session());
 app.use('/api/auth', jwtAuthController); // JWT authentication
 app.use('/api/oauth', authController); // Google OAuth (tách riêng để tránh conflict)
 app.use('/api/user', userController)
+app.use('/api/flash-card', flashCardController)
 
 // Health check
 app.get('/health', (req, res) => {
